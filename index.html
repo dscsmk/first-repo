@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>종합 퀴즈 — AI / ML / NLP [123]</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --bg-accent: #e7efe8;
+      --ink: #1c2420;
+      --muted: #5a665f;
+      --line: #c9d0c8;
+      --card: #fffcf6;
+      --accent: #0f6b4c;
+      --accent-soft: #d8efe5;
+      --wrong: #9b2c2c;
+      --wrong-soft: #fde8e8;
+      --ok: #0f6b4c;
+      --ok-soft: #d8efe5;
+      --shadow: 0 10px 30px rgba(28, 36, 32, 0.08);
+      --radius: 18px;
+      --font: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      --display: "Fraunces", "Noto Serif KR", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #d9ebe2 0%, transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, #f0e2cf 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg), var(--bg-accent));
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 80px;
+    }
+
+    header.hero {
+      padding: 28px 0 18px;
+      animation: rise 0.6s ease both;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1.15;
+      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      color: var(--muted);
+      margin: 0;
+      max-width: 42rem;
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      background: rgba(243, 240, 232, 0.85);
+      border: 1px solid rgba(201, 208, 200, 0.7);
+      border-radius: 16px;
+      padding: 12px;
+      margin: 22px 0 18px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
+      animation: rise 0.7s ease both;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab, .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .tab:hover, .btn:hover { transform: translateY(-1px); }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 700;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .actions-left, .actions-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 700;
+    }
+    .btn.ghost { background: transparent; }
+    .score {
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .score strong { color: var(--accent); font-size: 1.05rem; }
+
+    .progress {
+      height: 8px;
+      background: #e4e8e3;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #178a61, #0f6b4c);
+      transition: width 0.35s ease;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: 1.25rem;
+      margin: 28px 0 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .quiz {
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(201, 208, 200, 0.85);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 16px;
+      animation: rise 0.45s ease both;
+    }
+    .card.is-hidden { display: none; }
+    .q-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #eef2ef;
+      color: var(--muted);
+    }
+    .badge.type-mc { background: #e7f2ec; color: var(--accent); }
+    .badge.type-ox { background: #efe8f8; color: #5b3d8a; }
+    .badge.type-desc { background: #f7ebe0; color: #8a4b1f; }
+    .badge.type-multi { background: #e8eef8; color: #2f4f8a; }
+    .badge.result-ok { background: var(--ok-soft); color: var(--ok); }
+    .badge.result-bad { background: var(--wrong-soft); color: var(--wrong); }
+    .badge.result-pending { background: #f0efe8; color: #6a6558; }
+
+    .q-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.45;
+      margin: 0 0 12px;
+      white-space: pre-wrap;
+    }
+    .q-extra {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: -4px 0 12px;
+      white-space: pre-wrap;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+    .option {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 14px;
+      padding: 11px 12px;
+      cursor: pointer;
+      font: inherit;
+      line-height: 1.4;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+    .option:hover:not(:disabled) {
+      border-color: #8fb8a5;
+      transform: translateY(-1px);
+    }
+    .option .mark {
+      flex: 0 0 auto;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      border: 1.5px solid #a8b5ad;
+      display: grid;
+      place-items: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .option.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .option.selected .mark {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .option.correct {
+      border-color: var(--ok);
+      background: var(--ok-soft);
+    }
+    .option.correct .mark {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: #fff;
+    }
+    .option.wrong {
+      border-color: var(--wrong);
+      background: var(--wrong-soft);
+    }
+    .option.wrong .mark {
+      background: var(--wrong);
+      border-color: var(--wrong);
+      color: #fff;
+    }
+    .option:disabled { cursor: default; }
+
+    .desc-box, .multi-input {
+      width: 100%;
+      min-height: 110px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+      color: var(--ink);
+    }
+    .multi-input { min-height: 44px; }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: none;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .feedback.show { display: block; animation: fade 0.25s ease; }
+    .feedback.ok {
+      background: var(--ok-soft);
+      border: 1px solid #b7dccb;
+      color: #134d38;
+    }
+    .feedback.bad {
+      background: var(--wrong-soft);
+      border: 1px solid #efc0c0;
+      color: #6e1f1f;
+    }
+    .feedback.info {
+      background: #f4f1ea;
+      border: 1px solid #ddd5c5;
+      color: #3d372c;
+    }
+    .feedback .label {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .group-block {
+      border: 1px dashed #c8d2cb;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+    .group-block h4 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+    }
+
+    footer.note {
+      margin-top: 36px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 20px, 920px); }
+      .card { padding: 16px 14px; }
+      .actions { align-items: stretch; }
+      .actions-left, .actions-right { width: 100%; }
+      .btn, .tab { flex: 1 1 auto; text-align: center; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650;9..144,700&family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow">종합 복습 퀴즈</div>
+      <h1>AI · 기계학습 · NLP</h1>
+      <p class="sub">선택지를 고른 뒤 각 문제의 「정답 확인」으로 바로 채점하세요. 상단에서 카테고리 필터와 일괄 채점도 가능합니다.</p>
+    </header>
+
+    <div class="toolbar">
+      <div class="tabs" id="tabs"></div>
+      <div class="actions">
+        <div class="actions-left">
+          <div class="score">채점 가능 <strong id="gradableCount">0</strong> · 맞춤 <strong id="correctCount">0</strong> · 틀림 <strong id="wrongCount">0</strong> · 미채점 <strong id="pendingCount">0</strong></div>
+        </div>
+        <div class="actions-right">
+          <button class="btn ghost" id="btnReset" type="button">초기화</button>
+          <button class="btn" id="btnRevealAll" type="button">전부 해설 보기</button>
+          <button class="btn primary" id="btnGradeAll" type="button">전부 채점</button>
+        </div>
+      </div>
+      <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+    </div>
+
+    <div id="quizRoot" class="quiz"></div>
+    <footer class="note"> 우리반 화이팅~! 만점 가즈아~!!! </footer>
+  </div>
+
+  <script>
+    const QUIZ = [
+      {
+        id: "1-1-q1", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q1",
+        question: "AI, ML, DL의 관계에 대한 설명으로 옳은 것은?",
+        options: [
+          { key: "1", text: "ML은 AI와 DL의 상위 개념이다." },
+          { key: "2", text: "AI는 반드시 ML을 사용해야 한다." },
+          { key: "3", text: "ML은 AI의 한 부분으로, 데이터로부터 학습을 수행한다." },
+          { key: "4", text: "규칙 기반 시스템은 ML의 한 분야이다." },
+          { key: "5", text: "ML은 사람이 직접 코딩한 규칙을 그대로 사용하는 방식이다." }
+        ],
+        answer: "3",
+        explain: "ML은 AI의 한 분야로, 데이터로부터 규칙을 학습해 목표 달성을 돕는다.\n- ①: ML은 AI의 하위 개념이다.\n- ②: AI는 규칙/휴리스틱 기반만으로도 구현 가능하다.\n- ④: 규칙 기반 시스템은 AI의 대표적인 예시이다.\n- ⑤: ML은 데이터에서 추론한다."
+      },
+      {
+        id: "1-1-q2", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q2",
+        question: "Feature와 Label에 대한 설명으로 옳지 않은 것은?",
+        options: [
+          { key: "1", text: "Feature는 모델이 예측에 사용하는 입력 정보이다." },
+          { key: "2", text: "Label은 모델이 예측하려는 정답, 즉 학습의 목표이다." },
+          { key: "3", text: "Feature와 Label의 분포와 관계가 학습 결과를 결정한다." },
+          { key: "4", text: "Feature는 반드시 수치형 데이터만 될 수 있다." },
+          { key: "5", text: "Label은 분류 문제에서는 카테고리, 회귀 문제에서는 수치값이 될 수 있다." }
+        ],
+        answer: "4",
+        explain: "Feature는 수치형뿐 아니라 범주형, 텍스트, 이미지/음성 등도 가능하다."
+      },
+      {
+        id: "1-1-q3", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q3",
+        question: "미지의 참 함수 f(X)를 학습하는 이유로 적절하지 않은 것은?",
+        options: [
+          { key: "1", text: "Feature(X)와 Label(Y) 사이의 관계를 알기 위해" },
+          { key: "2", text: "모든 데이터의 측정오차(ε)를 제거하기 위해" },
+          { key: "3", text: "새로운 입력 X에 대해 목표값 Y를 예측하기 위해" },
+          { key: "4", text: "여러 Feature(X) 중 Label(Y)과 관계를 갖고 있는 Feature를 알기 위해" },
+          { key: "5", text: "Feature(X) 값의 변화에 따라서 Label(Y)이 어떻게 변화하는지 알기 위해" }
+        ],
+        answer: "2",
+        explain: "학습을 잘 한다고 하여 측정오차를 줄이거나 제거할 수 없다."
+      },
+      {
+        id: "1-1-q4", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q4",
+        question: "지도학습(Supervised Learning)에 대한 설명으로 옳은 것은?",
+        options: [
+          { key: "1", text: "입력 데이터만 있고 정답(라벨)이 없는 데이터로 학습한다." },
+          { key: "2", text: "새로운 입력에 대해 정답을 잘 맞추는 함수를 학습한다." },
+          { key: "3", text: "오버피팅은 훈련 데이터에서의 오류를 최대한 줄이는 것으로 학습이 목표하는 방향이다." },
+          { key: "4", text: "지도학습 모델의 출력은 반드시 범주(카테고리)이다." },
+          { key: "5", text: "지도학습은 측정오차를 최소화하는 것이 목적이다." }
+        ],
+        answer: "2",
+        explain: "지도학습은 입력(특성)과 정답(라벨)이 쌍으로 있는 데이터를 학습하여 새로운 입력의 정답을 맞추는 규칙을 찾는다.\n- ①: 입력만 있고 정답이 없는 경우는 비지도 학습이다.\n- ③: 일반화 성능을 높이는 것이 궁극적인 목적이기에 오버피팅은 피해야 한다.\n- ④: 지도학습 모델 출력은 수치(회귀)와 범주(분류) 모두 가능하다.\n- ⑤: 예측값과 정답의 차이(오차)를 줄이는 것이 핵심이다."
+      },
+      {
+        id: "1-1-q5", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q5",
+        question: "회귀(Regression) 문제의 특징으로 옳은 것은?",
+        options: [
+          { key: "1", text: "스팸/정상 분류와 같은 범주 예측 문제를 다룬다." },
+          { key: "2", text: "예측값은 연속적인 숫자(예: 가격, 점수, 온도)로 나온다." },
+          { key: "3", text: "대표적인 성능 지표는 정확도(Accuracy)이다." },
+          { key: "4", text: "예측 결과는 이산적인 값으로 한정된다." },
+          { key: "5", text: "훈련 데이터와 테스트 데이터의 분포가 다르면 반드시 발생한다." }
+        ],
+        answer: "2",
+        explain: "회귀 문제는 연속적인 수치를 예측하는 문제다 (집값, 매출액, 온도 등).\n- ①: 범주를 예측하는 것은 분류(Classification) 문제다.\n- ③: 회귀에서는 MSE, RMSE, R² 등의 지표를 사용한다.\n- ④: 이산 값은 분류 문제의 특징이다."
+      },
+      {
+        id: "1-1-q6", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q6",
+        question: "혼동행렬에 대한 설명으로 옳지 않은 것은?",
+        options: [
+          { key: "1", text: "TP(True Positive): 실제 양성을 양성으로 예측한 경우" },
+          { key: "2", text: "TN(True Negative): 실제 음성을 음성으로 예측한 경우" },
+          { key: "3", text: "FP(False Positive): 실제 음성인데 양성으로 잘못 예측한 경우" },
+          { key: "4", text: "FN(False Negative): 실제 양성인데 음성으로 잘못 예측한 경우" },
+          { key: "5", text: "혼동행렬은 회귀 문제의 성능 평가에서 사용된다." }
+        ],
+        answer: "5",
+        explain: "혼동행렬은 분류 문제의 성능 평가 지표이다. 회귀 문제에서는 MSE, RMSE, R² 등의 지표를 사용한다."
+      },
+      {
+        id: "1-1-q7", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q7",
+        question: "훈련 오류와 테스트 오류에 대한 설명으로 옳은 것은?",
+        options: [
+          { key: "1", text: "훈련 오류는 새로운 데이터에 대한 예측 정확도를 측정한다." },
+          { key: "2", text: "테스트 오류는 학습에 사용된 데이터에 대해 계산한 평균 오차이다." },
+          { key: "3", text: "궁극적으로 테스트 오류를 최소화하는 것이 학습의 목적이다." },
+          { key: "4", text: "일반적으로 훈련 오류는 테스트 오류보다 크게 나타난다." },
+          { key: "5", text: "훈련 오류는 항상 0에 수렴해야 좋은 모델이다." }
+        ],
+        answer: "3",
+        explain: "학습의 목적은 일반화 성능을 높이는 것이며, 이는 테스트 오류를 최소화하는 것이다.\n- ①: 새로운 데이터는 테스트 오류가 담당한다.\n- ②: 이는 훈련 오류에 대한 설명이다.\n- ④: 일반적으로 훈련 오류 < 테스트 오류이다.\n- ⑤: 훈련 오류가 0에 가까우면 오버피팅일 가능성이 높다."
+      },
+      {
+        id: "1-1-q8", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q8",
+        question: "언더피팅과 오버피팅의 특징을 올바르게 설명한 것은?",
+        options: [
+          { key: "1", text: "언더피팅은 훈련 오류와 테스트 오류 모두 크게 나타난다." },
+          { key: "2", text: "언더피팅은 모델이 지나치게 복잡해 데이터 잡음까지 학습하는 현상이다." },
+          { key: "3", text: "오버피팅은 모델이 단순해 중요한 패턴을 놓치는 현상이다." },
+          { key: "4", text: "오버피팅은 훈련 오류가 크고 테스트 오류가 작게 나타난다." },
+          { key: "5", text: "두 경우 모두 모델 복잡도를 높이면 해결된다." }
+        ],
+        answer: "1",
+        explain: "언더피팅은 모델이 너무 단순하여 데이터 패턴을 제대로 학습하지 못해 훈련 오류와 테스트 오류 모두 크게 나타난다.\n- ②: 오버피팅에 대한 설명이다.\n- ④: 오버피팅에서는 훈련 오류 < 테스트 오류이다.\n- ⑤: 언더피팅은 복잡도를 높이면 개선되지만, 오버피팅은 오히려 더 심해진다."
+      },
+      {
+        id: "1-1-q9", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q9",
+        question: "K-겹 교차검증(K-fold CV)에 대한 설명으로 옳지 않은 것은?",
+        options: [
+          { key: "1", text: "데이터를 K개 그룹(폴드)으로 나누어, 각 그룹을 한 번씩 검증셋으로 사용한다." },
+          { key: "2", text: "K번 반복한 후 각 폴드별 평균 오차를 계산해 일반화 성능을 추정한다." },
+          { key: "3", text: "K=n일 경우 Leave-One-Out 교차검증(LOOCV)이다." },
+          { key: "4", text: "교차검증은 데이터 활용성을 높이면서 테스트 오류에 대한 추정이 가능하다." },
+          { key: "5", text: "교차검증 시, 각 폴드에 속한 데이터가 겹쳐도 무방하다." }
+        ],
+        answer: "5",
+        explain: "교차검증에서는 각 폴드별 데이터가 겹치지 않도록 명확히 분리해야 한다."
+      },
+      {
+        id: "1-1-q10", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "Q10",
+        question: "다음 중 비지도 학습의 예로 해당하는 것은?",
+        options: [
+          { key: "A", text: "스팸/이메일 분류" },
+          { key: "B", text: "집값 변화 예측" },
+          { key: "C", text: "(라벨이 없는 데이터에서) 구매 성향별 고객 묶음" },
+          { key: "D", text: "주간 날씨 예측" }
+        ],
+        answer: "C",
+        explain: "정답이 없는 묶음 문제로 전형적인 클러스터링 문제이다."
+      },
+      {
+        id: "1-1-q11", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "multi", label: "Q11",
+        question: "다음 설명이 K-means의 특징인지, 계층적 군집의 특징인지 분류하시오.",
+        extra: "각 항목에 K-means 또는 계층적 군집을 선택하세요.",
+        parts: [
+          { id: "A", text: "A. 클러스터 수 K를 미리 지정해야 한다.", answer: "K-means" },
+          { id: "B", text: "B. 덴드로그램(Dendrogram)을 통해 전체 구조를 시각적으로 제공한다.", answer: "계층적 군집" },
+          { id: "C", text: "C. 데이터 간 병합(상향식) 과정을 통해 클러스터를 형성한다.", answer: "계층적 군집" },
+          { id: "D", text: "D. 클러스터 내부 변동(Within-cluster variation)의 합이 최소가 되도록 분할한다.", answer: "K-means" },
+          { id: "E", text: "E. 매우 큰 데이터셋에도 계산 복잡도가 크게 늘지 않아 효율적이다.", answer: "K-means" }
+        ],
+        choices: ["K-means", "계층적 군집"],
+        explain: "K-means: A, D, E / 계층적 군집: B, C\nK-means는 군집 내 분산을 최소화하도록 반복 계산하며, 빠르고 대규모 데이터에 효율적이지만 클러스터 수를 미리 지정해야 한다.\n계층적 군집은 트리(덴드로그램) 구조를 만드는 방식으로, 클러스터 수를 미리 정하지 않아도 되지만 대규모 데이터에는 비효율적이다."
+      },
+      {
+        id: "1-1-p36", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 36",
+        question: "AI, ML, DL의 포함 관계 설명으로 옳은 것을 고르시오. (A ⊂ B : A가 B에 포함된다.)",
+        options: [
+          { key: "1", text: "DL ⊂ AI ⊂ ML" },
+          { key: "2", text: "AI ⊂ ML ⊂ DL" },
+          { key: "3", text: "ML ⊂ DL ⊂ AI" },
+          { key: "4", text: "DL ⊂ ML ⊂ AI" }
+        ],
+        answer: "4",
+        explain: "정답: 4 (DL ⊂ ML ⊂ AI)"
+      },
+      {
+        id: "1-1-p50", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 50",
+        question: "다음 중 Feature와 Label에 대한 설명으로 옳지 않은 것을 고르시오.",
+        options: [
+          { key: "1", text: "Feature는 입력 설명 변수이다." },
+          { key: "2", text: "Label은 예측 대상(정답)이다." },
+          { key: "3", text: "Feature는 오직 수치형만 가능하다." },
+          { key: "4", text: "Feature - Label의 분포와 관계가 성능에 영향을 준다." }
+        ],
+        answer: "3",
+        explain: "Feature는 수치형뿐 아니라 범주형 등도 가능하다."
+      },
+      {
+        id: "1-1-p48", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 48",
+        question: "다음 중 분류 문제의 예로 옳은 것은?",
+        options: [
+          { key: "1", text: "월매출 예측" },
+          { key: "2", text: "온도 예측" },
+          { key: "3", text: "집값 예측" },
+          { key: "4", text: "이메일 스팸/정상 판별" }
+        ],
+        answer: "4",
+        explain: "스팸/정상 판별은 범주 예측이므로 분류 문제이다."
+      },
+      {
+        id: "1-1-p6", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 6",
+        question: "오버피팅과 분포 변화(Data Shift)의 개념으로 옳은 설명을 고르시오.",
+        options: [
+          { key: "1", text: "오버피팅은 훈련·테스트 분포가 달라서만 발생한다." },
+          { key: "2", text: "분포 변화로 오류가 늘 수 있으나, 이는 오버피팅과 별개의 개념이다." },
+          { key: "3", text: "분포 변화가 없으면 오버피팅은 불가능하다." },
+          { key: "4", text: "오버피팅은 테스트 성능이 높을 때 나타난다." }
+        ],
+        answer: "2",
+        explain: "분포 변화와 오버피팅은 별개의 개념이다."
+      },
+      {
+        id: "1-1-p4", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 4",
+        question: "K-fold 교차검증의 주된 목적은?",
+        options: [
+          { key: "1", text: "훈련 오차 최소화" },
+          { key: "2", text: "테스트 데이터 누출 방지" },
+          { key: "3", text: "일반화 성능 추정의 분산을 줄이며 편향을 완화" },
+          { key: "4", text: "파라미터 수를 줄여 모델 단순화" }
+        ],
+        answer: "3",
+        explain: "교차검증은 일반화 성능을 더 안정적으로 추정하기 위한 방법이다."
+      },
+      {
+        id: "1-1-p14", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 14",
+        question: "다음 중 혼동행렬에 대한 설명으로 틀린 것을 고르시오.",
+        options: [
+          { key: "1", text: "True Positive (TP): 실제 양성·예측 양성" },
+          { key: "2", text: "True Negative (TN): 실제 음성·예측 음성" },
+          { key: "3", text: "False Positive (FP): 실제 양성인데 음성으로 예측" },
+          { key: "4", text: "False Negative (FN): 실제 양성인데 음성으로 예측" }
+        ],
+        answer: "3",
+        explain: "FP는 실제 음성인데 양성으로 잘못 예측한 경우이다."
+      },
+      {
+        id: "1-1-p26", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 26",
+        question: "이진 분류에서 정밀도(Precision)를 TP, FP, TN, FN를 이용한 수식으로 잘 나타낸 것을 고르시오.",
+        options: [
+          { key: "1", text: "TP / (TP + FP)" },
+          { key: "2", text: "TP / (TP + FN)" },
+          { key: "3", text: "FP / (TP + FP)" },
+          { key: "4", text: "FN / (TP + FN)" }
+        ],
+        answer: "1",
+        explain: "Precision = TP / (TP + FP). 양성으로 예측한 것 중 실제로 양성인 비율이다."
+      },
+      {
+        id: "1-1-p66", section: "1-1", sectionTitle: "1-1 AI & 기계학습 기초",
+        type: "mc", label: "문제 66",
+        question: "다음 중 회귀 문제로 가장 적절한 것은?",
+        options: [
+          { key: "1", text: "이메일이 스팸인지 정상인지 예측" },
+          { key: "2", text: "종양이 양성인지 악성인지 예측" },
+          { key: "3", text: "아파트 매매가 예측" },
+          { key: "4", text: "고객이 이탈할지 여부 분류" }
+        ],
+        answer: "3",
+        explain: "회귀는 연속적인 수치를 예측하는 문제다. 1·2·4는 분류 문제이고, 아파트 매매가만 연속형 수치이다."
+      },
+
+      /* ===== 1-2 ===== */
+      {
+        id: "1-2-q12", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "desc", label: "Q12",
+        question: "다음 질문에 대해 서술하시오. (선형회귀 기본)",
+        extra: "① 선형회귀의 기본 목적은?\n② 단순선형회귀 모형의 수식과 각 계수의 의미는?\n③ 잔차(Residual)의 정의와 역할은?\n④ 최소제곱법(Least Squares)의 핵심 아이디어는?",
+        answerText: "① 입력 변수와 출력 변수 간의 선형 관계를 찾고, 이를 통해 예측 및 해석을 수행하는 것\n② Y = β₀ + β₁X + ε (β₀: 절편, β₁: 기울기 모수, ε: 관측오차)\n③ 잔차 = 실제값 - 예측값. 모델이 설명하지 못한 부분으로, 모델 적합도를 판단하는 지표\n④ 잔차제곱합(RSS)를 최소화하는 계수를 찾는 방법으로, 데이터와 회귀선 간의 차이를 최소화하는 원리"
+      },
+      {
+        id: "1-2-q13", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "desc", label: "Q13",
+        question: "다중선형회귀에 대해 서술하시오.",
+        extra: "① 다중선형회귀 모형의 수식과 각 항의 의미\n② 변수 추가 시 장점과 단점\n③ 다중공선성 문제\n④ 대표 성능 지표 두 가지",
+        answerText: "① Y = β₀ + β₁X₁ + ... + βpXp + ε\n② 설명력 향상 가능 / 과적합·해석 복잡성 증가\n③ 계수 분산 증가, 추정 불안정, 해석·예측력 저하\n④ R², RSE"
+      },
+      {
+        id: "1-2-q14", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "Q14",
+        question: "다음 중 틀린 설명은?",
+        options: [
+          { key: "A", text: "다중범주 문제에는 선형회귀보다 Multiclass Logistic Regression 또는 다른 분류 모델이 적절하다." },
+          { key: "B", text: "선형 회귀 예측값을 확률로 해석하면 0 미만 또는 1 초과가 나올 수 있어 확률로서 타당하지 않다." },
+          { key: "C", text: "기상 상태 예측 모델을 만들 때, Y ∈ {1: 맑음, 2: 눈, 3: 비}와 같이 정수형 코딩을 진행해야만 적절한 예측이 가능하다." },
+          { key: "D", text: "범주형(질적) 변수는 순서가 없는 집합에서 값을 가진다." }
+        ],
+        answer: "C",
+        explain: "범주형 변수를 정수 코딩하면 인위적 순서를 암시하고, 1↔2와 2↔3의 거리가 동일하다는 가정을 암묵적으로 전제하게 된다."
+      },
+      {
+        id: "1-2-q15", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "Q15",
+        question: "로지스틱 함수의 출력으로 옳은 것은?",
+        options: [
+          { key: "A", text: "[0, 1]" },
+          { key: "B", text: "(0, 1)" },
+          { key: "C", text: "(-∞, +∞)" },
+          { key: "D", text: "{0, 1}" }
+        ],
+        answer: "B",
+        explain: "로지스틱 회귀의 출력은 어떤 X, β에 대해서도 p(X; β) ∈ (0, 1)가 보장된다. 끝점 0과 1은 극한으로만 접근한다."
+      },
+      {
+        id: "1-2-q16", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "ox", label: "Q16",
+        question: '로지스틱 회귀에서 "현재 확률 함수가 데이터를 얼마나 잘 설명하는지"를 나타낸 지표로 사용하는 것은 평균 제곱 오차(MSE)이다.',
+        answer: "X",
+        explain: "로지스틱 회귀에서 모수를 추정할 때 사용하는 표준 지표는 MSE가 아니라 우도(likelihood)를 최대화하는 MLE이다."
+      },
+      {
+        id: "1-2-q17", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "group", label: "Q17",
+        question: "손실 함수 및 경사 하강법 관련 문제",
+        parts: [
+          {
+            id: "1", type: "mc",
+            question: "1. 손실함수(Loss Function)의 역할로 가장 알맞은 것은?",
+            options: [
+              { key: "a", text: "입력 데이터를 무작위로 섞는다." },
+              { key: "b", text: "모델의 예측이 얼마나 잘못되었는지 측정한다." },
+              { key: "c", text: "파라미터를 업데이트하는 규칙을 제공한다." },
+              { key: "d", text: "학습률(learning rate)을 설정한다." }
+            ],
+            answer: "b"
+          },
+          {
+            id: "2", type: "mc",
+            question: "2. 경사 하강법(Gradient Descent)에서 'Step 1'에 해당하는 단계는?",
+            options: [
+              { key: "a", text: "파라미터를 무작위로 초기화" },
+              { key: "b", text: "손실함수를 최소화" },
+              { key: "c", text: "파라미터에 대한 기울기(미분값)를 계산" },
+              { key: "d", text: "데이터를 섞어 미니배치를 생성" }
+            ],
+            answer: "c"
+          },
+          {
+            id: "3", type: "mc",
+            question: "3. 확률적 경사 하강법(SGD)의 장점은?",
+            options: [
+              { key: "a", text: "항상 전역 최적해(global optimum)에 도달한다." },
+              { key: "b", text: "계산 비용이 커서 정밀하다." },
+              { key: "c", text: "일부 데이터만으로 업데이트해 연산 비용이 작다." },
+              { key: "d", text: "항상 같은 결과로 수렴한다." }
+            ],
+            answer: "c"
+          },
+          {
+            id: "4", type: "mc",
+            question: "4. Convex 문제의 특징으로 맞는 것은?",
+            options: [
+              { key: "a", text: "2차 미분이 항상 0이다." },
+              { key: "b", text: "2차 미분이 모든 구간에서 음수이다." },
+              { key: "c", text: "2차 미분이 모든 구간에서 양수이다." },
+              { key: "d", text: "미분값이 존재하지 않는다." }
+            ],
+            answer: "c"
+          },
+          {
+            id: "5", type: "short",
+            question: "5. 학습 과정에서 손실함수를 최소화하기 위해 조정하는 값은?",
+            answer: "파라미터",
+            accept: ["파라미터", "parameters", "parameter", "모수", "가중치"]
+          },
+          {
+            id: "6", type: "short",
+            question: "6. 경사 하강법에서 파라미터를 업데이트 시 사용하는 고정된 비율은?",
+            answer: "학습률",
+            accept: ["학습률", "learning rate", "러닝레이트", "α", "alpha", "학습 비율"]
+          },
+          {
+            id: "7", type: "ox",
+            question: "7. SGD가 경사 하강법(full-batch GD)보다 항상 수렴 속도가 빠른가?",
+            answer: "X",
+            explain: "항상 그렇지 않다. Convex(에 가까운) 문제에서는 오히려 GD의 수렴 속도가 빠를 수 있다."
+          },
+          {
+            id: "8", type: "desc",
+            question: "8. SGD는 국소 최솟값(local minima)에서 벗어날 수 있는 이유는?",
+            answerText: "미니배치를 무작위로 선택하여 기울기에 노이즈가 포함되므로, 국소 최솟값이나 안장점(saddle point)에 머무르지 않고 더 넓은 영역을 탐색할 수 있다."
+          }
+        ],
+        explain: "1. b / 2. c / 3. c / 4. c\n5. 파라미터(Parameters)\n6. 학습률(Learning Rate, α)\n7. 항상 그렇지 않다. Convex에 가까운 문제에서는 GD가 더 빠를 수 있다.\n8. 미니배치 노이즈로 국소 최솟값/안장점에서 벗어나 더 넓은 영역을 탐색할 수 있다."
+      },
+      {
+        id: "1-2-q29", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "desc", label: "Q29",
+        question: "다음 질문에 대해 서술하시오. (활성화 함수 / 초기화)",
+        extra: "① 좋은 모델 구조를 골랐는데도 학습이 실패할 수 있는 이유는?\n② Sigmoid 함수의 주요 문제는?\n③ Leaky ReLU가 ReLU와 다른 점은?\n④ ResNet에서 사용하는 전처리 방식은?",
+        answerText: "① 구조가 좋아도 학습률, 정규화, 초기화 같은 훈련 전략이 잘못되면 성능이 떨어진다.\n② 출력이 0이나 1이면 기울기가 0이 되어 역전파가 끊긴다(기울기 소실).\n③ ReLU는 음수에서 기울기 0, Leaky ReLU는 음수에 작은 기울기를 유지한다.\n④ 스케일까지 맞추는 배치 정규화로 학습 효율성을 높인다."
+      },
+      {
+        id: "1-2-q30", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "desc", label: "Q30",
+        question: "다음 질문에 대해 서술하시오. (학습률 / 하이퍼파라미터)",
+        extra: "① 드롭아웃 활용 시 유의할 점\n② 계단식 학습 비율 감소 방식의 단점\n③ 학습 비율 선정의 기본 전략\n④ 하이퍼파라미터 선정 두 가지 방식",
+        answerText: "① 학습·추론 간 분포 차이로 성능 저하 가능\n② 변경 지점 선정이 복잡하고 학습 곡선이 불안정할 수 있음\n③ 초반 큰 학습률로 탐색, 이후 줄여 수렴\n④ 그리드 탐색, 랜덤 탐색"
+      },
+      {
+        id: "1-2-p40", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 40",
+        question: "다음 중 RSS의 정의에 대한 올바른 설명을 고르시오.",
+        options: [
+          { key: "1", text: "예측값들의 평균" },
+          { key: "2", text: "관측오차의 합" },
+          { key: "3", text: "잔차 제곱의 합" },
+          { key: "4", text: "표본분산" }
+        ],
+        answer: "3",
+        explain: "RSS = Residual Sum of Squares = 잔차 제곱의 합"
+      },
+      {
+        id: "1-2-p23", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 23",
+        question: "다음 중 결정계수 R²에 대한 옳은 설명을 고르시오.",
+        options: [
+          { key: "1", text: "값이 0보다 작아질 수 없는 지표이다." },
+          { key: "2", text: "평균 예측보다 나쁠수록 값이 1에 가까워진다." },
+          { key: "3", text: "0~1 구간을 벗어날 수 있다." },
+          { key: "4", text: "값이 클수록 항상 과적합이다." }
+        ],
+        answer: "3",
+        explain: "R²는 평균보다 나쁜 모델에서 음수가 될 수 있어 0~1 구간을 벗어날 수 있다."
+      },
+      {
+        id: "1-2-p24", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 24",
+        question: "다음 중 올바른 것을 모두 고르시오.",
+        extra: "ㄱ. 상관이 높아도 인과관계가 아닐 수 있다.\nㄴ. 설명변수 간 상관이 클수록 계수 추정 분산이 커질 수 있다.\nㄷ. 다중공선성이 심하면 p-value가 항상 과소추정된다.",
+        options: [
+          { key: "1", text: "ㄱ" },
+          { key: "2", text: "ㄱ, ㄴ" },
+          { key: "3", text: "ㄴ, ㄷ" },
+          { key: "4", text: "ㄱ, ㄴ, ㄷ" }
+        ],
+        answer: "2",
+        explain: "ㄷ은 틀렸다. 다중공선성이 심하면 p-value가 과대추정(검정력 감소)될 수 있다."
+      },
+      {
+        id: "1-2-p13", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 13",
+        question: "다음 중 신경망에 대한 설명으로 옳지 않은 것을 고르시오.",
+        options: [
+          { key: "1", text: "Deep 네트워크는 shallow 네트워크를 여러개(복수)로 합성하는 것으로 생각할 수 있다." },
+          { key: "2", text: "네트워크의 깊이를 늘리면 어떤 함수들에 대해서는 필요한 유닛 수 및 파라미터가 감소할 수 있다(표현 효율성 향상)." },
+          { key: "3", text: "깊이를 늘리면 항상 훈련이 쉬워지고 최적화가 안정해진다." },
+          { key: "4", text: "Deep 네트워크에서 파라미터 업데이트는 여러층에서의 미분값의 곱이 관여한다." }
+        ],
+        answer: "3",
+        explain: "깊이를 늘리면 표현력은 향상되지만, 기울기 소실/폭발 등으로 최적화가 오히려 어려워질 수 있다."
+      },
+      {
+        id: "1-2-p28", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 28",
+        question: "다음 중 확률적 경사하강법(SGD)의 장점으로 옳지 않은 것을 고르시오.",
+        options: [
+          { key: "1", text: "미니배치를 사용해 스텝당 연산량이 작다." },
+          { key: "2", text: "노이즈가 있어 local minima를 빠져나오는데 유리할 수 있다." },
+          { key: "3", text: "항상 full-batch GD보다 빠르게 수렴한다." },
+          { key: "4", text: "대규모 데이터에서 효율적이다." }
+        ],
+        answer: "3",
+        explain: "SGD는 convex에 가까운 문제에서 full-batch GD보다 수렴이 느릴 수 있다."
+      },
+      {
+        id: "1-2-p61", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 61",
+        question: "다음 중 이진 분류 문제에서 선형회귀보다 로지스틱 회귀를 쓰는 이유로 가장 적절한 것을 고르시오.",
+        options: [
+          { key: "1", text: "계산이 항상 더 빠르기 때문이다." },
+          { key: "2", text: "예측값을 0과 1 사이의 확률로 해석할 수 있기 때문이다." },
+          { key: "3", text: "범주 수가 많을수록 정확하기 때문이다." },
+          { key: "4", text: "p-value를 계산할 수 없기 때문이다." }
+        ],
+        answer: "2",
+        explain: "선형회귀 출력은 (-∞, +∞)라 확률로 쓰기 어렵고, 로지스틱은 (0, 1)로 보장된다."
+      },
+      {
+        id: "1-2-p62", section: "1-2", sectionTitle: "1-2 AI & 기계학습 방법",
+        type: "mc", label: "문제 62",
+        question: "다음 중 손실함수(Loss Function)의 역할로 가장 알맞은 것을 고르시오.",
+        options: [
+          { key: "1", text: "입력 데이터를 무작위로 섞는다." },
+          { key: "2", text: "모델의 예측이 얼마나 잘못되었는지 측정한다." },
+          { key: "3", text: "파라미터를 업데이트하는 규칙을 제공한다." },
+          { key: "4", text: "학습률(learning rate)을 설정한다." }
+        ],
+        answer: "2",
+        explain: "손실함수는 예측값과 정답의 차이를 수치로 측정한다. 업데이트 규칙은 옵티마이저, 학습률은 하이퍼파라미터다."
+      },
+
+      /* ===== 2-1 ===== */
+      {
+        id: "2-1-p12", section: "2-1", sectionTitle: "2-1 자연어 처리 기본",
+        type: "mc", label: "문제 12",
+        question: "One-hot Representation(원-핫-인코딩)에 대한 설명으로 옳지 않은 것을 고르시오.",
+        options: [
+          { key: "1", text: "차원이 매우 커져 계산량이 증가한다." },
+          { key: "2", text: "단어 간의 유사도는 항상 1이 나온다." },
+          { key: "3", text: "대부분의 값이 0으로 채워져 메모리 효율이 낮다." },
+          { key: "4", text: '"Dog" - "Puppy"의 거리와 "Dog" - "Computer"의 거리는 같다.' }
+        ],
+        answer: "2",
+        explain: "원-핫에서는 모든 단어 벡터가 직교하므로 유사도는 항상 0이다. 의미적 유사성을 반영하지 못한다."
+      },
+      {
+        id: "2-1-p60", section: "2-1", sectionTitle: "2-1 자연어 처리 기본",
+        type: "mc", label: "문제 60",
+        question: "CBOW와 Skip-gram의 차이점에 대한 설명으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "CBOW는 Skip-gram보다 적게 등장하는 단어에 대해 더 높은 정확도를 보인다." },
+          { key: "2", text: "CBOW는 Skip-gram보다 학습이 빠르고, 빈도가 높은 단어에서 성능이 좋다." },
+          { key: "3", text: "Skip-gram은 학습 속도는 빠르지만 드물게 등장하는 단어에 약하다." },
+          { key: "4", text: "Skip-gram은 한번에 여러 단어를 예측한다." }
+        ],
+        answer: "2",
+        explain: "CBOW: 주변→중심, 학습 빠르고 빈출 단어에 강함\nSkip-gram: 중심→주변, 학습 느리지만 희귀 단어에 강함"
+      },
+
+      /* ===== 2-2 ===== */
+      {
+        id: "2-2-q18", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "Q18",
+        question: "거대 언어 모델과 BERT, GPT-1 같은 기존 언어 모델의 차이점으로 올바른 것은?",
+        options: [
+          { key: "a", text: "다음 토큰 예측에 기반한 자기 지도 학습 방법" },
+          { key: "b", text: "트랜스포머에 기반한 모델 구조" },
+          { key: "c", text: "모델 및 학습 규모가 커지면서 나타난 창발성" },
+          { key: "d", text: "이미지와 같은 도메인을 포함한 새로운 멀티 모달 학습 데이터" }
+        ],
+        answer: "c",
+        explain: "a), b)는 기존 언어 모델에서도 적용되며, LLM은 텍스트 다음 토큰 예측으로 학습하므로 d)와 같이 이미지 데이터를 활용하지 않는다."
+      },
+      {
+        id: "2-2-q19", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "Q19",
+        question: "지시 학습과 선호 학습에 대해 올바르지 않은 것은?",
+        options: [
+          { key: "a", text: "효과적인 지시 학습을 위해서는 다양한 지시 데이터가 필요하다." },
+          { key: "b", text: "크기가 충분하지 않은 거대 언어 모델은 지시 학습 후에 성능이 떨어질 수 있다." },
+          { key: "c", text: "보상 모델은 사람의 선호를 모방하도록 학습된다." },
+          { key: "d", text: "강화 학습 기반 선호 학습의 모든 과정에는 사람의 개입이 필요하다." }
+        ],
+        answer: "d",
+        explain: "1·2단계에는 사람 지도가 필요하지만, 3단계(강화학습)에서는 보상 모델 피드백으로 학습하므로 사람의 개입이 필요하지 않다."
+      },
+      {
+        id: "2-2-q20", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "Q20",
+        question: "거대 언어 모델의 다양한 디코딩 알고리즘에 대한 설명으로 올바르지 않은 것은?",
+        options: [
+          { key: "a", text: "Greedy Decoding은 가장 확률이 높은 토큰을 다음 토큰으로 생성한다." },
+          { key: "b", text: "Beam Search는 확률이 높은 응답 후보를 동시에 고려하기 때문에 더 많은 생성 비용을 필요로 한다." },
+          { key: "c", text: "1 이상의 Temperature를 사용할 경우 더 다양한 응답이 생성될 확률이 감소한다." },
+          { key: "d", text: "Top-K Sampling은 생성 확률이 높은 K개의 토큰만을 생성 후보로 두고 확률 값에 따라 무작위로 다음 토큰을 생성한다." }
+        ],
+        answer: "c",
+        explain: "Temperature ≥ 1이면 분포가 uniform에 가까워져 더 다양한 토큰이 생성될 확률이 증가한다."
+      },
+      {
+        id: "2-2-q21", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "Q21",
+        question: "거대 언어 모델의 평가 및 한계에 대해 올바르지 않은 것은?",
+        options: [
+          { key: "a", text: "주어진 질문에 대해 정답을 모르는 경우에도, LLM-as-judge 방식을 통해 생성 응답에 대해 평가할 수 있다." },
+          { key: "b", text: "LLM-as-judge 방식을 선호 판단에 활용하는 경우, 길이가 짧은 응답을 선호하는 길이 편향이 있을 수 있다." },
+          { key: "c", text: "최신 거대 언어 모델은 안전성 훈련이 잘 되어 있으므로, 탈옥 현상이 일어나지 않는다." },
+          { key: "d", text: "거대 언어 모델이 생성한 응답은 탐지가 가능할 수 있으므로, 무분별하게 사용해서는 안된다." }
+        ],
+        answer: "b",
+        explain: "LLM-as-judge는 길이가 긴 응답을 선호하는 길이 편향이 있다. (짧은 응답 선호가 아님)"
+      },
+      {
+        id: "2-2-p1", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 1",
+        question: "파인튜닝과 인스트럭션 튜닝의 차이에 대한 설명으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "파인튜닝은 다양한 지시문을 활용해 범용적인 응답 능력을 강화한다." },
+          { key: "2", text: "인스트럭션 튜닝은 매우 특정 도메인에만 최적화한다." },
+          { key: "3", text: "파인튜닝은 특정 태스크에 맞도록 모델을 조정한다." },
+          { key: "4", text: "인스트럭션 튜닝은 사전학습 없이 수행된다." }
+        ],
+        answer: "3",
+        explain: "파인튜닝은 특정 도메인/태스크에 맞추고, 인스트럭션 튜닝은 다양한 지시문으로 범용 지시 수행 능력을 강화한다."
+      },
+      {
+        id: "2-2-p3", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 3",
+        question: "거대 언어 모델의 성능을 올바르게 평가하기 위해 고려해야 할 사항으로 옳은 것은?",
+        options: [
+          { key: "1", text: "가장 어려운 단일 테스크에서의 정확도만 비교해도 충분" },
+          { key: "2", text: "여러 테스크에서의 종합 성능을 평가" },
+          { key: "3", text: "모델 파라미터 수만 비교" },
+          { key: "4", text: "추론 속도만 측정" }
+        ],
+        answer: "2",
+        explain: "여러 테스크에서의 종합 성능을 평가해야 한다."
+      },
+      {
+        id: "2-2-p5", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 5",
+        question: "BERT 모델의 사전학습의 방법으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "Masked Language Modeling" },
+          { key: "2", text: "Masked Entity Prediction" },
+          { key: "3", text: "Salient Span Prediction" },
+          { key: "4", text: "Permuted Language Modeling" }
+        ],
+        answer: "1",
+        explain: "BERT는 MLM과 NSP로 사전학습된다."
+      },
+      {
+        id: "2-2-p19", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 19",
+        question: '"The dog has …" 문장에서 Greedy Decoding을 사용하면 다음 단어로 선택되는 것을 고르시오.',
+        options: [
+          { key: "1", text: "been" },
+          { key: "2", text: "eaten" },
+          { key: "3", text: "run" },
+          { key: "4", text: "a" }
+        ],
+        answer: "4",
+        explain: "Greedy Decoding은 매 스텝에서 가장 높은 확률의 토큰을 선택한다. \"a\"가 가장 높다."
+      },
+      {
+        id: "2-2-p27", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 27",
+        question: '"The dog has …" 문장에서 Temperature=1.5일 때 가장 가능성이 높은 현상을 고르시오.',
+        options: [
+          { key: "1", text: "항상 'a'가 선택된다" },
+          { key: "2", text: "낮은 확률 단어도 선택될 수 있다" },
+          { key: "3", text: "확률이 높은 단어만 남는다" },
+          { key: "4", text: "문장이 항상 동일하게 생성된다" }
+        ],
+        answer: "2",
+        explain: "Temperature > 1이면 분포가 평탄해져 낮은 확률 단어도 선택될 가능성이 높아진다."
+      },
+      {
+        id: "2-2-p31", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 31",
+        question: "트랜스포머 모델에서 '멀티-헤드 어텐션' 메커니즘에 대한 설명으로 가장 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "멀티-헤드 어텐션은 시퀀스 내의 각 단어에 대해 하나의 어텐션 가중치를 계산하여, 그 결과를 조합해 최종 출력을 생성한다." },
+          { key: "2", text: "멀티-헤드 어텐션은 단일 어텐션 메커니즘보다 계산 복잡도가 낮으며, 따라서 모델의 학습 시간을 단축시킨다." },
+          { key: "3", text: "멀티-헤드 어텐션에서는 여러 개의 어텐션 '헤드'를 사용하여 서로 다른 표현 공간에서 어텐션을 수행하고, 이를 조합하여 정보를 종합한다." },
+          { key: "4", text: "멀티-헤드 어텐션은 모든 헤드가 동일한 가중치를 공유하므로, 모델의 일반화 능력을 향상시키지만 해석하기 어렵다." }
+        ],
+        answer: "3",
+        explain: "각 헤드는 독립적인 가중치로 서로 다른 표현 공간을 학습하며, 다양한 관점의 어텐션 정보를 결합한다."
+      },
+      {
+        id: "2-2-p35", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 35",
+        question: "다음 중 파인튜닝의 특징으로 가장 관련이 높은 것을 고르시오.",
+        options: [
+          { key: "1", text: "Instruction-following 능력 강화" },
+          { key: "2", text: "특정 응용 서비스에 맞춘 모델 커스터마이징" },
+          { key: "3", text: "지시문 생성 능력 향상" },
+          { key: "4", text: "Alignment 성능 향상" }
+        ],
+        answer: "2",
+        explain: "파인튜닝은 특정 응용/태스크에 맞춘 커스터마이징이 핵심이다."
+      },
+      {
+        id: "2-2-p38", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 38",
+        question: '"LLM-as-Judge" 접근법의 주요 한계로 옳지 않은 것을 고르시오.',
+        options: [
+          { key: "1", text: "위치 편향" },
+          { key: "2", text: "길이 편향" },
+          { key: "3", text: "자기 선호 편향" },
+          { key: "4", text: "모델의 계산 효율성 저하" }
+        ],
+        answer: "4",
+        explain: "주요 한계는 위치·길이·자기선호 편향이다. 계산 효율성 저하는 해당 '한계'로 언급되지 않는다."
+      },
+      {
+        id: "2-2-p46", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 46",
+        question: "다음 중 BLEU에 대한 설명으로 옳지 않은 것을 고르시오.",
+        options: [
+          { key: "1", text: "N-gram을 통한 순서쌍들이 얼마나 겹치는지 측정하는 지표이다." },
+          { key: "2", text: "기계 번역 성능을 측정하기 위해 고안된 지표이다." },
+          { key: "3", text: "텍스트 생성 모델을 평가하기 위해 사용된다." },
+          { key: "4", text: "지표 측정 시 문장 길이를 고려하지 않는다." }
+        ],
+        answer: "4",
+        explain: "BLEU는 Brevity Penalty(BP)로 문장 길이를 고려한다."
+      },
+      {
+        id: "2-2-p52", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 52",
+        question: '"The dog has …" 문장에서 Beam Search(beam size=2)의 누적 확률 기준으로 더 유리한 문장을 고르시오.',
+        options: [
+          { key: "1", text: "The dog has a …" },
+          { key: "2", text: "The dog has been …" },
+          { key: "3", text: "두 문장 모두 같다" },
+          { key: "4", text: "알 수 없다" }
+        ],
+        answer: "1",
+        explain: '"a"가 더 높은 단일 확률을 갖는 상황에서 해당 경로의 누적 확률이 더 높다.'
+      },
+      {
+        id: "2-2-p53", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 53",
+        question: "다음 중 프롬프트 튜닝의 장점이 아닌 것을 고르시오.",
+        options: [
+          { key: "1", text: "사람의 디자인 없이 스스로 프롬프트를 학습할 수 있음" },
+          { key: "2", text: "사전학습된 모델을 고정할 수 있음" },
+          { key: "3", text: "적은 비용으로 새로운 데이터셋을 모델에 적응시킬 수 있음" },
+          { key: "4", text: "학습된 프롬프트를 해석함" }
+        ],
+        answer: "4",
+        explain: "학습된 soft prompt는 연속 벡터라 자연어로 해석하기 어렵다."
+      },
+      {
+        id: "2-2-p64", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 64",
+        question: "개인 목적에 맞게 파운데이션 모델을 활용할 때 유의해야 할 점으로 올바르지 않은 것을 고르시오.",
+        options: [
+          { key: "1", text: "미세 조정 시에는 많은 데이터를 사용해야만 한다" },
+          { key: "2", text: "미세 조정도 비용이 크게 느껴진다면, 프롬프트 튜닝을 시도할 수 있다" },
+          { key: "3", text: "학습 없이 활용하고자 한다면, 프롬프트 디자인을 시도할 수 있다" },
+          { key: "4", text: "미세 조정 시에는 조금만 학습하기 위해 낮은 학습률을 사용하는 것이 유리하다" }
+        ],
+        answer: "1",
+        explain: "파운데이션 모델은 소량 도메인 데이터로도 미세 조정이 가능하다. 비용 순서: 프롬프트 디자인 < 프롬프트 튜닝 < 미세 조정"
+      },
+      {
+        id: "2-2-p67", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 67",
+        question: "다음 중 선호 학습(Preference Learning)의 핵심에 대해 올바르게 설명한 것을 고르시오.",
+        options: [
+          { key: "1", text: "모델이 가장 긴 응답을 생성하게 함" },
+          { key: "2", text: "여러 응답 중 사람이 더 선호하는 것을 학습" },
+          { key: "3", text: "모델이 무작위로 응답을 생성" },
+          { key: "4", text: "여러 응답 중 가장 좋은 응답을 모델이 스스로 판단하여 학습" }
+        ],
+        answer: "2",
+        explain: "선호 학습은 사람이 비교·순위화한 데이터로 보상 모델을 학습하고 정렬하는 방식이다."
+      },
+      {
+        id: "2-2-p70", section: "2-2", sectionTitle: "2-2 텍스트 파운데이션 모델",
+        type: "mc", label: "문제 70",
+        question: "RLHF 파이프라인의 일반적 단계로 옳은 것은?",
+        options: [
+          { key: "1", text: "사전학습 → 프롬프트 엔지니어링 → 보상 모델 제거" },
+          { key: "2", text: "지도학습 → 보상 모델 학습 → 정책 최적화" },
+          { key: "3", text: "지도학습 없이 바로 정책 최적화" },
+          { key: "4", text: "보상 모델 학습 없이 인간이 직접 강화학습 수행" }
+        ],
+        answer: "2",
+        explain: "RLHF: ① SFT(지시 학습) → ② 보상 모델 학습 → ③ 강화학습 정책 최적화"
+      },
+
+      /* ===== 3-1 ===== */
+      {
+        id: "3-1-q22", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q22",
+        question: "CNN 기반 모델 변천사를 순서대로 나열하면?",
+        extra: "A. MobileNet / B. VGG / C. AlexNet / D. GoogLeNet / E. ResNet",
+        options: [
+          { key: "1", text: "C → B → D → E → A" },
+          { key: "2", text: "C → D → B → E → A" },
+          { key: "3", text: "B → C → D → E → A" },
+          { key: "4", text: "C → B → E → D → A" }
+        ],
+        answer: "1",
+        explain: "정답: C → B → D → E → A\n- AlexNet (2012): 딥러닝 CNN의 본격적인 시작점\n- VGG (2014): 3×3 작은 필터를 깊게 쌓은 구조\n- GoogLeNet/Inception (2014): Inception 모듈 도입\n- ResNet (2015): Residual Connection 도입, 기울기 소실 문제 해결\n- MobileNet (2017): 모바일/임베디드 환경 최적화, Depthwise Separable Convolution 도입"
+      },
+      {
+        id: "3-1-q23", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q23",
+        question: "CNN 모델의 특징과 가장 먼 것은?",
+        options: [
+          { key: "1", text: "이미지의 모든 화소를 나열하여 1차원 벡터로 만들어 입력 데이터를 활용한다." },
+          { key: "2", text: "기본 구조는 합성곱 → 활성화 → 풀링 → 완전연결층으로 이루어져 있다." },
+          { key: "3", text: "지역적인 특징을 먼저 학습하고, 층이 깊어질수록 추상적 특징을 학습한다." },
+          { key: "4", text: "위치 변화나 노이즈에 대해 강건하다." },
+          { key: "5", text: "층이 깊어질수록 지역 수용 영역(Receptive Field)이 커져, 더 넓은 맥락을 이해할 수 있다." }
+        ],
+        answer: "1",
+        explain: "CNN의 핵심은 입력 이미지의 2차원 구조를 보존한 채 합성곱과 풀링으로 지역적 특징을 추출하는 것이다. 1차원 벡터로 변환하는 것은 출력 단계의 보조 과정일 뿐이다."
+      },
+      {
+        id: "3-1-q24", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q24",
+        question: "CNN에서 풀링(Pooling)의 주요 목적이 아닌 것은?",
+        options: [
+          { key: "1", text: "차원 축소 및 연산량 감소" },
+          { key: "2", text: "위치 변화에 대한 불변성 확보" },
+          { key: "3", text: "네트워크의 파라미터 수 증가" },
+          { key: "4", text: "지역적 특징을 요약하여 다음 층에 전달" }
+        ],
+        answer: "3",
+        explain: "Pooling 연산 자체는 학습해야 할 파라미터가 없으며(비학습적 연산), 오히려 feature map의 크기를 줄여 다음 층에서 필요한 연산량과 파라미터 수를 감소시킨다."
+      },
+      {
+        id: "3-1-q25", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q25",
+        question: "CNN 구조의 장점이 아닌 것은?",
+        options: [
+          { key: "1", text: "지역적인 특징 학습에 특화되어 작은 필터로 패턴이나 경계선 특징을 잘 포착한다." },
+          { key: "2", text: "파라미터 효율성이 뛰어나 이미지 블록별 가중치를 공유함으로써 연산량을 줄인다." },
+          { key: "3", text: "Pooling과 Stride 연산으로 인해 위치 변화와 노이즈에도 견고하다." },
+          { key: "4", text: "이미지 분류, 탐지 등 다양한 이미지 기반 과업에서 표준 모델로 활용된다." },
+          { key: "5", text: "텍스트나 음성과 같은 순차적 데이터의 순서 정보를 효과적으로 반영한다." }
+        ],
+        answer: "5",
+        explain: "CNN은 이미지 처리에 최적화된 구조이다. 텍스트나 음성 같은 순차적 데이터의 시간·순서 의존성을 반영하는 데는 한계가 있으며, 이는 RNN이나 Transformer 계열 모델이 더 적합하다."
+      },
+      {
+        id: "3-1-q26", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q26",
+        question: "RNN의 특징으로 옳지 않은 것은?",
+        options: [
+          { key: "1", text: "은닉 상태(hidden state)를 통해 이전 시점의 정보를 다음 시점으로 전달한다." },
+          { key: "2", text: "순차적 데이터를 처리하는 데 적합하다." },
+          { key: "3", text: "입력 데이터의 시계열 의존성을 반영할 수 있다." },
+          { key: "4", text: "병렬 연산이 쉬워 대규모 데이터 처리에서 속도가 빠르다." },
+          { key: "5", text: "언어 모델링, 기계 번역, 음성 인식 등에 활용된다." }
+        ],
+        answer: "4",
+        explain: "RNN은 입력 데이터를 순차적으로 처리해야 하므로 병렬 연산이 어렵고, 대규모 데이터 학습 시 속도가 느려지는 단점이 있다."
+      },
+      {
+        id: "3-1-q27", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q27",
+        question: "RNN의 대표적인 한계로 올바른 것을 모두 고르시오.",
+        extra: "A. 기울기 소실 / B. 기울기 폭발 / C. 과적합 / D. 병렬화 어려움",
+        options: [
+          { key: "1", text: "A, B" },
+          { key: "2", text: "A, B, D" },
+          { key: "3", text: "A, C, D" },
+          { key: "4", text: "A, B, C, D" }
+        ],
+        answer: "1",
+        explain: "정답: A, B\nRNN은 BPTT 시 동일 가중치가 반복 곱해지면서 기울기 소실/폭발이 발생하여 장기 의존성 학습이 어렵다. 과적합은 일반적 문제이고, 병렬화 어려움은 한계이긴 하나 대표적 한계로는 거리가 멀다."
+      },
+      {
+        id: "3-1-q28", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "Q28",
+        question: "Vision Transformer(ViT)의 특징에 대한 설명으로 옳지 않은 것은?",
+        options: [
+          { key: "1", text: "패치를 나눈 후 위치 인코딩을 통해 순서(위치) 정보를 추가한다." },
+          { key: "2", text: "인코더는 정규화, 다중헤드 어텐션, 연결층(MLP)으로 반복적으로 구성된다." },
+          { key: "3", text: "CNN과 달리 수용영역을 넓히지 않아도 전역 맥락을 학습할 수 있다." },
+          { key: "4", text: "데이터가 작을 때도 CNN보다 항상 높은 성능을 보장한다." },
+          { key: "5", text: "대규모 학습 데이터와 GPU 자원이 필요하다." }
+        ],
+        answer: "4",
+        explain: "ViT는 대규모 학습 데이터가 있을 때 강력한 성능을 발휘하지만, 데이터가 적은 경우에는 오히려 CNN보다 성능이 떨어질 수 있다."
+      },
+      {
+        id: "3-1-p8", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 8",
+        question: "RNN의 연산 과정에 대한 설명 중 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "h0부터 ht까지 계산이 진행되면서 각 시점의 입력 xt가 누적되어 hidden state의 차원이 점점 커진다." },
+          { key: "2", text: "RNN은 각 시점의 입력을 처리할 때 tanh같은 linear function를 사용한다." },
+          { key: "3", text: "RNN은 이전 시점의 정보가 다음 시점 계산에 영향을 주지 않는다." },
+          { key: "4", text: "최종 출력은 마지막 시점의 ht를 기반으로 계산된다." }
+        ],
+        answer: "4",
+        explain: "- 1: hidden state의 차원은 고정된다.\n- 2: tanh는 non-linear(비선형) 함수이다.\n- 3: hidden state를 통해 이전 정보가 전달된다."
+      },
+      {
+        id: "3-1-p30", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 30",
+        question: "Conv1과 Pool1의 출력 크기로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "Conv1: 30×30×8 / Pool1: 15×15×8" },
+          { key: "2", text: "Conv1: 32×32×8 / Pool1: 16×16×8" },
+          { key: "3", text: "Conv1: 32×32×3 / Pool1: 16×16×3" },
+          { key: "4", text: "Conv1: 34×34×8 / Pool1: 17×17×8" }
+        ],
+        answer: "2",
+        explain: "정답: Conv1: 32×32×8 / Pool1: 16×16×8"
+      },
+      {
+        id: "3-1-p37", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 37",
+        question: "Conv1과 FC 층의 총 파라미터 수(가중치+편향)의 조합으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "Conv1: 224개 / FC: 20,490개" },
+          { key: "2", text: "Conv1: 200개 / FC: 18,000개" },
+          { key: "3", text: "Conv1: 72개 / FC: 20,490개" },
+          { key: "4", text: "Conv1: 72개 / FC: 18,000개" }
+        ],
+        answer: "1",
+        explain: "정답: Conv1: 224개 / FC: 20,490개"
+      },
+      {
+        id: "3-1-p42", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 42",
+        question: "Conv1과 FC 층의 연산량(FLOPs, 곱셈+덧셈 한 쌍=2 FLOPs 기준)으로 가장 적절한 것을 고르시오.",
+        options: [
+          { key: "1", text: "Conv1: 221,184 FLOPs / FC: 20,480 FLOPs" },
+          { key: "2", text: "Conv1: 442,368 FLOPs / FC: 40,960 FLOPs" },
+          { key: "3", text: "Conv1: 110,592 FLOPs / FC: 20,480 FLOPs" },
+          { key: "4", text: "Conv1: 884,736 FLOPs / FC: 40,960 FLOPs" }
+        ],
+        answer: "2",
+        explain: "정답: Conv1: 442,368 FLOPs / FC: 40,960 FLOPs"
+      },
+      {
+        id: "3-1-p45", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 45",
+        question: "Conv1 커널을 1×1로 변경한 경우, 1×1 Conv 도입에 대한 설명으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "공간 정보를 더 풍부하게 학습하고 파라미터 수도 늘릴 수 있다" },
+          { key: "2", text: "채널 혼합에는 유리하지만 공간 이웃을 보지 못한다" },
+          { key: "3", text: "연산량이 증가하므로 실시간 처리에 부적합하다" },
+          { key: "4", text: "Pooling과 동일하게 동작하므로 특징 손실을 방지할 수 있다" }
+        ],
+        answer: "2",
+        explain: "1×1 Conv는 채널 혼합에는 유리하지만 공간 이웃을 보지 못한다."
+      },
+      {
+        id: "3-1-p55", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 55",
+        question: "Conv1 커널을 1×1로 변경한 경우, Conv1 파라미터 수 및 연산량(FLOPs)에 대한 설명으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "파라미터 32개 / FLOPs 49,152" },
+          { key: "2", text: "파라미터 32개 / FLOPs 442,368" },
+          { key: "3", text: "파라미터 224개 / FLOPs 49,152" },
+          { key: "4", text: "파라미터 224개 / FLOPs 884,736" }
+        ],
+        answer: "1",
+        explain: "정답: 파라미터 32개 / FLOPs 49,152"
+      },
+      {
+        id: "3-1-p56", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 56",
+        question: "Conv1 출력(feature map)을 float32로 모두 저장할 때 필요한 메모리 용량으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "8 KB" },
+          { key: "2", text: "16 KB" },
+          { key: "3", text: "32 KB" },
+          { key: "4", text: "64 KB" }
+        ],
+        answer: "3",
+        explain: "정답: 32 KB"
+      },
+      {
+        id: "3-1-p63", section: "3-1", sectionTitle: "3-1 딥러닝 & 영상 모델",
+        type: "mc", label: "문제 63",
+        question: "다음 중 LSTM에 대한 설명 중 틀린 것은?",
+        options: [
+          { key: "1", text: "LSTM은 RNN의 장기 의존성 문제를 개선하기 위해 제안되었다." },
+          { key: "2", text: "LSTM은 순차 데이터가 아닌 정적인 이미지 데이터에만 사용된다." },
+          { key: "3", text: "LSTM은 forget gate, input gate, output gate를 포함한다." },
+          { key: "4", text: "LSTM은 cell state를 통해 정보를 장기간 유지할 수 있다." }
+        ],
+        answer: "2",
+        explain: "LSTM은 RNN 계열로 언어·음성·시계열 같은 순차 데이터를 처리하기 위해 만들어졌다. 정적 이미지 처리는 CNN의 영역이다."
+      },
+
+      /* ===== 3-2 ===== */
+      {
+        id: "3-2-p22", section: "3-2", sectionTitle: "3-2 이미지 파운데이션 모델",
+        type: "mc", label: "문제 22",
+        question: "파운데이션 모델 등장 이전의 AI 학습 방식으로 옳은 것을 고르시오.",
+        options: [
+          { key: "1", text: "모든 작업에 동일한 모델을 사용" },
+          { key: "2", text: "작업별 별도 학습 필요" },
+          { key: "3", text: "자가 학습 기반 학습" },
+          { key: "4", text: "멀티모달 입력 사용" }
+        ],
+        answer: "2",
+        explain: "파운데이션 모델 등장 이전에는 분류, 탐지, 생성 등 각 태스크마다 별도로 데이터를 모으고 모델을 학습해야 했다."
+      },
+      {
+        id: "3-2-p25", section: "3-2", sectionTitle: "3-2 이미지 파운데이션 모델",
+        type: "mc", label: "문제 25",
+        question: "다음 중 이미지 생성(text-to-image) 모델이 아닌 것을 고르시오.",
+        options: [
+          { key: "1", text: "DALL-E 3" },
+          { key: "2", text: "Midjourney v7" },
+          { key: "3", text: "Stable Diffusion" },
+          { key: "4", text: "SAM" }
+        ],
+        answer: "4",
+        explain: "SAM(Segment Anything Model)은 이미지 세그멘테이션 모델로, 텍스트-이미지 생성 모델이 아니다."
+      },
+      {
+        id: "3-2-p29", section: "3-2", sectionTitle: "3-2 이미지 파운데이션 모델",
+        type: "mc", label: "문제 29",
+        question: "SigLIP 연구에서 채택한 손실 함수를 고르시오.",
+        options: [
+          { key: "1", text: "Softmax" },
+          { key: "2", text: "ReLU" },
+          { key: "3", text: "Sigmoid" },
+          { key: "4", text: "GELU" }
+        ],
+        answer: "3",
+        explain: "SigLIP은 CLIP의 Softmax 기반 대조 손실 대신 Sigmoid 손실을 사용하여 이미지-텍스트 쌍 학습의 효율성을 높인 방법이다."
+      },
+      {
+        id: "3-2-p34", section: "3-2", sectionTitle: "3-2 이미지 파운데이션 모델",
+        type: "mc", label: "문제 34",
+        question: "VLM에서 비전 인코더가 만족해야 하는 조건을 고르시오.",
+        options: [
+          { key: "1", text: "이미지를 언어와 연관 지어 이해할 수 있는 능력" },
+          { key: "2", text: "파라미터 수가 언어 모델보다 항상 커야 함" },
+          { key: "3", text: "토큰화를 직접 수행할 수 있어야 함" },
+          { key: "4", text: "사고 능력과 언어 능력만으로 충분함" }
+        ],
+        answer: "1",
+        explain: "VLM의 비전 인코더는 이미지 특징을 언어 모델이 이해할 수 있는 표현으로 변환하는 역할을 해야 한다."
+      },
+      {
+        id: "3-2-p51", section: "3-2", sectionTitle: "3-2 이미지 파운데이션 모델",
+        type: "mc", label: "문제 51",
+        question: '다음 중 "오픈" 이미지 생성 모델을 모두 고르시오.',
+        extra: "1. DALL-E 3\n2. Stable Diffusion\n3. Latent Diffusion Model\n4. Midjourney v7",
+        options: [
+          { key: "A", text: "1, 2" },
+          { key: "B", text: "2, 3" },
+          { key: "C", text: "2, 3, 4" },
+          { key: "D", text: "1, 2, 3" }
+        ],
+        answer: "B",
+        explain: "정답: 2, 3\nStable Diffusion과 Latent Diffusion Model은 오픈소스다. DALL-E 3와 Midjourney v7은 상용 폐쇄형 서비스이다."
+      }
+    ];
+
+    const SECTIONS = [
+      { id: "all", name: "전체" },
+      { id: "1-1", name: "1-1 기초" },
+      { id: "1-2", name: "1-2 방법" },
+      { id: "2-1", name: "2-1 NLP" },
+      { id: "2-2", name: "2-2 LLM" },
+      { id: "3-1", name: "3-1 Vision" },
+      { id: "3-2", name: "3-2 Img FM" }
+    ];
+
+    const state = {
+      filter: "all",
+      answers: {},
+      graded: {}
+    };
+
+    const root = document.getElementById("quizRoot");
+    const tabs = document.getElementById("tabs");
+
+    function typeLabel(type) {
+      if (type === "mc") return "객관식";
+      if (type === "ox") return "O/X";
+      if (type === "desc") return "서술형";
+      if (type === "multi") return "분류";
+      if (type === "group") return "복합";
+      return type;
+    }
+
+    function esc(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function isGradable(q) {
+      return q.type === "mc" || q.type === "ox" || q.type === "multi" || q.type === "group";
+    }
+
+    function renderTabs() {
+      tabs.innerHTML = SECTIONS.map(s =>
+        `<button class="tab ${state.filter === s.id ? "active" : ""}" data-section="${s.id}" type="button">${s.name}</button>`
+      ).join("");
+    }
+
+    function visibleQuestions() {
+      return state.filter === "all" ? QUIZ : QUIZ.filter(q => q.section === state.filter);
+    }
+
+    function optionButtons(qid, options, selected, graded, correctKey) {
+      return options.map(opt => {
+        let cls = "option";
+        if (selected === opt.key) cls += " selected";
+        if (graded) {
+          if (opt.key === correctKey) cls += " correct";
+          else if (selected === opt.key && selected !== correctKey) cls += " wrong";
+        }
+        return `<button type="button" class="${cls}" data-qid="${qid}" data-key="${esc(opt.key)}" ${graded ? "disabled" : ""}>
+          <span class="mark">${esc(opt.key)}</span>
+          <span>${esc(opt.text)}</span>
+        </button>`;
+      }).join("");
+    }
+
+    function renderCard(q, index) {
+      const graded = !!state.graded[q.id];
+      const result = state.graded[q.id];
+      let body = "";
+      let resultBadge = "";
+
+      if (graded) {
+        if (result === "ok") resultBadge = `<span class="badge result-ok">정답</span>`;
+        else if (result === "bad") resultBadge = `<span class="badge result-bad">오답</span>`;
+        else if (result === "partial") resultBadge = `<span class="badge result-pending">부분 정답</span>`;
+        else resultBadge = `<span class="badge result-pending">해설 확인</span>`;
+      }
+
+      if (q.type === "mc" || q.type === "ox") {
+        const opts = q.type === "ox"
+          ? [{ key: "O", text: "O (옳다)" }, { key: "X", text: "X (틀리다)" }]
+          : q.options;
+        const selected = state.answers[q.id] ?? null;
+        body = `<div class="options">${optionButtons(q.id, opts, selected, graded, q.answer)}</div>`;
+      } else if (q.type === "desc") {
+        const val = state.answers[q.id] ?? "";
+        body = `<textarea class="desc-box" data-qid="${q.id}" placeholder="여기에 답을 적어보세요 (선택). 확인 버튼으로 모범 답안을 볼 수 있습니다." ${graded ? "readonly" : ""}>${esc(val)}</textarea>`;
+      } else if (q.type === "multi") {
+        const ans = state.answers[q.id] || {};
+        body = q.parts.map(p => {
+          const selected = ans[p.id] ?? null;
+          const opts = q.choices.map(c => ({ key: c, text: c }));
+          return `<div class="group-block">
+            <h4>${esc(p.text)}</h4>
+            <div class="options">${optionButtons(`${q.id}::${p.id}`, opts, selected, graded, p.answer)}</div>
+          </div>`;
+        }).join("");
+      } else if (q.type === "group") {
+        const ans = state.answers[q.id] || {};
+        body = q.parts.map(p => {
+          const pid = `${q.id}::${p.id}`;
+          const selected = ans[p.id] ?? null;
+          if (p.type === "mc" || p.type === "ox") {
+            const opts = p.type === "ox"
+              ? [{ key: "O", text: "O (옳다)" }, { key: "X", text: "X (틀리다)" }]
+              : p.options;
+            return `<div class="group-block">
+              <h4>${esc(p.question)}</h4>
+              <div class="options">${optionButtons(pid, opts, selected, graded, p.answer)}</div>
+            </div>`;
+          }
+          if (p.type === "short") {
+            return `<div class="group-block">
+              <h4>${esc(p.question)}</h4>
+              <input class="multi-input" data-qid="${pid}" type="text" value="${esc(selected ?? "")}" placeholder="답을 입력하세요" ${graded ? "readonly" : ""} />
+              ${graded ? `<div class="feedback show info"><div class="label">정답</div>${esc(p.answer)}</div>` : ""}
+            </div>`;
+          }
+          return `<div class="group-block">
+            <h4>${esc(p.question)}</h4>
+            <textarea class="desc-box" data-qid="${pid}" placeholder="답을 적어보세요" ${graded ? "readonly" : ""}>${esc(selected ?? "")}</textarea>
+            ${graded ? `<div class="feedback show info"><div class="label">모범 답안</div>${esc(p.answerText)}</div>` : ""}
+          </div>`;
+        }).join("");
+      }
+
+      let feedbackHtml = "";
+      if (graded) {
+        const explain = q.explain || q.answerText || "";
+        let cls = "info";
+        let title = "해설";
+        if (result === "ok") { cls = "ok"; title = "정답입니다"; }
+        else if (result === "bad") { cls = "bad"; title = "오답입니다"; }
+        else if (result === "partial") { cls = "info"; title = "부분 정답"; }
+        else if (q.type === "desc") { title = "모범 답안"; }
+        feedbackHtml = `<div class="feedback show ${cls}"><div class="label">${title}</div>${esc(explain)}</div>`;
+      }
+
+      return `<article class="card" data-id="${q.id}">
+        <div class="q-meta">
+          <span class="badge">${esc(q.label)}</span>
+          <span class="badge type-${q.type === "ox" ? "ox" : q.type === "desc" ? "desc" : q.type === "multi" || q.type === "group" ? "multi" : "mc"}">${typeLabel(q.type)}</span>
+          <span class="badge">${esc(q.sectionTitle)}</span>
+          ${resultBadge}
+        </div>
+        <p class="q-title">${index + 1}. ${esc(q.question)}</p>
+        ${q.extra ? `<p class="q-extra">${esc(q.extra)}</p>` : ""}
+        ${body}
+        <div class="card-actions">
+          <button class="btn primary" type="button" data-grade="${q.id}">${graded ? "다시 보기" : "정답 확인"}</button>
+          ${graded ? `<button class="btn ghost" type="button" data-ungrade="${q.id}">다시 풀기</button>` : ""}
+        </div>
+        ${feedbackHtml}
+      </article>`;
+    }
+
+    function render() {
+      renderTabs();
+      const list = visibleQuestions();
+      let html = "";
+      let lastSection = null;
+      list.forEach((q, i) => {
+        if (state.filter === "all" && q.sectionTitle !== lastSection) {
+          lastSection = q.sectionTitle;
+          html += `<h2 class="section-title">${esc(q.sectionTitle)}</h2>`;
+        }
+        html += renderCard(q, i);
+      });
+      root.innerHTML = html || `<div class="card">표시할 문제가 없습니다.</div>`;
+      updateScore();
+    }
+
+    function normalize(s) {
+      return String(s || "").trim().toLowerCase().replace(/\s+/g, "");
+    }
+
+    function gradeQuestion(q, forceReveal = false) {
+      if (q.type === "mc" || q.type === "ox") {
+        const selected = state.answers[q.id];
+        if (!selected && !forceReveal) {
+          alert("답을 선택한 뒤 확인해 주세요.");
+          return false;
+        }
+        state.graded[q.id] = selected === q.answer ? "ok" : "bad";
+        return true;
+      }
+      if (q.type === "desc") {
+        state.graded[q.id] = "info";
+        return true;
+      }
+      if (q.type === "multi") {
+        const ans = state.answers[q.id] || {};
+        const answered = q.parts.every(p => ans[p.id]);
+        if (!answered && !forceReveal) {
+          alert("모든 항목을 분류한 뒤 확인해 주세요.");
+          return false;
+        }
+        const correctCount = q.parts.filter(p => ans[p.id] === p.answer).length;
+        if (correctCount === q.parts.length) state.graded[q.id] = "ok";
+        else if (correctCount === 0) state.graded[q.id] = "bad";
+        else state.graded[q.id] = "partial";
+        return true;
+      }
+      if (q.type === "group") {
+        const ans = state.answers[q.id] || {};
+        let ok = 0, total = 0, missing = 0;
+        q.parts.forEach(p => {
+          if (p.type === "desc") return;
+          total += 1;
+          const val = ans[p.id];
+          if (val == null || String(val).trim() === "") {
+            missing += 1;
+            return;
+          }
+          if (p.type === "mc" || p.type === "ox") {
+            if (val === p.answer) ok += 1;
+          } else if (p.type === "short") {
+            const n = normalize(val);
+            if ((p.accept || [p.answer]).some(a => n.includes(normalize(a)))) ok += 1;
+          }
+        });
+        if (missing > 0 && !forceReveal) {
+          alert("채점 가능한 항목을 모두 답한 뒤 확인해 주세요. (서술형은 선택)");
+          return false;
+        }
+        if (ok === total) state.graded[q.id] = "ok";
+        else if (ok === 0) state.graded[q.id] = "bad";
+        else state.graded[q.id] = "partial";
+        return true;
+      }
+      return false;
+    }
+
+    function updateScore() {
+      const list = visibleQuestions().filter(isGradable);
+      let correct = 0, wrong = 0, pending = 0;
+      list.forEach(q => {
+        const g = state.graded[q.id];
+        if (g === "ok") correct += 1;
+        else if (g === "bad" || g === "partial") wrong += 1;
+        else pending += 1;
+      });
+      document.getElementById("gradableCount").textContent = list.length;
+      document.getElementById("correctCount").textContent = correct;
+      document.getElementById("wrongCount").textContent = wrong;
+      document.getElementById("pendingCount").textContent = pending;
+      const done = correct + wrong;
+      const pct = list.length ? Math.round((done / list.length) * 100) : 0;
+      document.getElementById("progressBar").style.width = pct + "%";
+    }
+
+    function setAnswer(qid, key) {
+      if (qid.includes("::")) {
+        const [parent, part] = qid.split("::");
+        if (state.graded[parent]) return;
+        state.answers[parent] = state.answers[parent] || {};
+        state.answers[parent][part] = key;
+      } else {
+        if (state.graded[qid]) return;
+        state.answers[qid] = key;
+      }
+      render();
+    }
+
+    root.addEventListener("click", (e) => {
+      const opt = e.target.closest(".option");
+      if (opt && !opt.disabled) {
+        setAnswer(opt.dataset.qid, opt.dataset.key);
+        return;
+      }
+      const gradeBtn = e.target.closest("[data-grade]");
+      if (gradeBtn) {
+        const q = QUIZ.find(x => x.id === gradeBtn.dataset.grade);
+        if (!q) return;
+        if (state.graded[q.id]) {
+          q._scroll = true;
+          return;
+        }
+        if (gradeQuestion(q)) render();
+        return;
+      }
+      const ungradeBtn = e.target.closest("[data-ungrade]");
+      if (ungradeBtn) {
+        const id = ungradeBtn.dataset.ungrade;
+        delete state.graded[id];
+        render();
+      }
+    });
+
+    root.addEventListener("input", (e) => {
+      const el = e.target.closest("[data-qid]");
+      if (!el) return;
+      const qid = el.dataset.qid;
+      if (qid.includes("::")) {
+        const [parent, part] = qid.split("::");
+        if (state.graded[parent]) return;
+        state.answers[parent] = state.answers[parent] || {};
+        state.answers[parent][part] = el.value;
+      } else {
+        if (state.graded[qid]) return;
+        state.answers[qid] = el.value;
+      }
+    });
+
+    tabs.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-section]");
+      if (!btn) return;
+      state.filter = btn.dataset.section;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("btnGradeAll").addEventListener("click", () => {
+      visibleQuestions().forEach(q => {
+        if (!state.graded[q.id]) gradeQuestion(q, true);
+      });
+      render();
+    });
+
+    document.getElementById("btnRevealAll").addEventListener("click", () => {
+      visibleQuestions().forEach(q => { gradeQuestion(q, true); });
+      render();
+    });
+
+    document.getElementById("btnReset").addEventListener("click", () => {
+      if (!confirm("현재 카테고리의 답안과 채점 결과를 초기화할까요?")) return;
+      const ids = new Set(visibleQuestions().map(q => q.id));
+      ids.forEach(id => {
+        delete state.answers[id];
+        delete state.graded[id];
+      });
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
